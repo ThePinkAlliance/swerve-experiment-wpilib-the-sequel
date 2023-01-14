@@ -5,7 +5,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
-
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -134,8 +134,8 @@ public class SwerveModule {
         driveMotor.set(ControlMode.PercentOutput,
                 state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
 
-        double output = turningPidController.calculate(getTurningPosition(), state.angle.getRadians())
-                / turningPidController.getSetpoint();
+        double output = turningPidController.calculate(getTurningPosition(), state.angle.getRadians());
+        double thetaInput = MathUtil.clamp(output, -0.5, 0.5);
 
         turningMotor.set(ControlMode.PercentOutput,
                 output);
@@ -144,6 +144,7 @@ public class SwerveModule {
         // turningMotor.set(turningPidController.calculate(getTurningPosition(),
         // state.angle.getRadians()));
         SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] PID Output", output);
+        SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] PID thetaInput", thetaInput);
         SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] PID Setpoint",
                 turningPidController.getSetpoint());
         SmartDashboard.putString("Swerve[" + canCoder.getDeviceID() + "] state", state.toString());
