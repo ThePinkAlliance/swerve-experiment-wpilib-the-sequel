@@ -20,6 +20,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.SwerveJoystickCmd;
+import frc.robot.commands.Zero;
 import frc.robot.subsystems.SwerveSubsystem;
 
 public class RobotContainer {
@@ -40,7 +41,9 @@ public class RobotContainer {
         }
 
         private void configureButtonBindings() {
-                new JoystickButton(driverJoytick, 2).whenPressed(() -> swerveSubsystem.zeroHeading());
+                // new JoystickButton(driverJoytick, 2).whenPressed(() ->
+                // swerveSubsystem.zeroHeading());
+                new JoystickButton(driverJoytick, 1).onTrue(new Zero(swerveSubsystem));
         }
 
         public Command getAutonomousCommand() {

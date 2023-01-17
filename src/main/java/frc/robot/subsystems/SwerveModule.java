@@ -78,7 +78,9 @@ public class SwerveModule {
     }
 
     public double getTurningPosition() {
-        return turningMotor.getSelectedSensorPosition() * 0.001559;
+        return Math.toRadians(canCoder.getAbsolutePosition());
+        // return (turningMotor.getSelectedSensorPosition() /
+        // Constants.ModuleConstants.kTurningMotorGearRatio) * 0.001559;
         // return turningMotor.getSelectedSensorPosition() *
         // ModuleConstants.kTurningEncoderRot2Rad;
         // return turningEncoder.getPosition();
@@ -90,7 +92,8 @@ public class SwerveModule {
     }
 
     public double getTurningVelocity() {
-        return turningMotor.getSelectedSensorVelocity() * 0.003068;
+        return Math.toRadians(canCoder.getVelocity());
+        // return turningMotor.getSelectedSensorVelocity() * 0.003068;
         // return turningMotor.getSelectedSensorVelocity() *
         // ModuleConstants.kTurningEncoderRPM2RadPerSec;
         // return turningEncoder.getVelocity();
@@ -135,7 +138,7 @@ public class SwerveModule {
                 state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
 
         double output = turningPidController.calculate(getTurningPosition(), state.angle.getRadians());
-        double thetaInput = MathUtil.clamp(output, -0.5, 0.5);
+        double thetaInput = (output / turningPidController.getSetpoint()) * 1;
 
         turningMotor.set(ControlMode.PercentOutput,
                 output);
@@ -143,11 +146,22 @@ public class SwerveModule {
         // DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
         // turningMotor.set(turningPidController.calculate(getTurningPosition(),
         // state.angle.getRadians()));
-        SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] PID Output", output);
         SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] PID thetaInput", thetaInput);
         SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] PID Setpoint",
                 turningPidController.getSetpoint());
         SmartDashboard.putString("Swerve[" + canCoder.getDeviceID() + "] state", state.toString());
+        SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] PID Output", output);
+    }
+
+    public void printDebug() {
+        SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] Turing Position", getTurningPosition());
+        SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] Turing Position Raw",
+                this.turningMotor.getSelectedSensorPosition());
+
+        SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] CANCoder Angle",
+                this.canCoder.getPosition());
+        SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] CANCoder Angle Raw",
+                this.canCoder.getAbsolutePosition());
     }
 
     public void stop() {

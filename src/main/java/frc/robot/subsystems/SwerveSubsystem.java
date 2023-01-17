@@ -93,6 +93,13 @@ public class SwerveSubsystem extends SubsystemBase {
         // odometer.resetPosition(pose, getRotation2d());
     }
 
+    public void setAllHeadings(double heading) {
+        frontLeft.setDesiredState(new SwerveModuleState(0, new Rotation2d(heading)));
+        frontRight.setDesiredState(new SwerveModuleState(0, new Rotation2d(heading)));
+        backLeft.setDesiredState(new SwerveModuleState(0, new Rotation2d(heading)));
+        backRight.setDesiredState(new SwerveModuleState(0, new Rotation2d(heading)));
+    }
+
     @Override
     public void periodic() {
         odometer.update(getRotation2d(),
@@ -103,6 +110,11 @@ public class SwerveSubsystem extends SubsystemBase {
         SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
 
         double p = SmartDashboard.getNumber("p", Constants.ModuleConstants.kPTurning);
+
+        frontLeft.printDebug();
+        frontRight.printDebug();
+        backLeft.printDebug();
+        backRight.printDebug();
 
         frontLeft.setPGain(p);
         frontRight.setPGain(p);
