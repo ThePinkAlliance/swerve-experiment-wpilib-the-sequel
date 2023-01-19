@@ -4,7 +4,9 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -32,6 +34,7 @@ public class SwerveJoystickCmd extends CommandBase {
 
     @Override
     public void initialize() {
+
     }
 
     @Override
@@ -68,6 +71,10 @@ public class SwerveJoystickCmd extends CommandBase {
 
         // 6. Output each module states to wheels
         swerveSubsystem.setModuleStates(moduleStates);
+    }
+
+    public void configureKp(double kP) {
+        swerveSubsystem.setKp(kP);
     }
 
     @Override

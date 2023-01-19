@@ -49,24 +49,13 @@ public class SwerveModule {
         driveMotor = new TalonFX(driveMotorId);
         turningMotor = new TalonFX(turningMotorId);
 
-        // driveMotor = new CANSparkMax(driveMotorId, MotorType.kBrushless);
-        // turningMotor = new CANSparkMax(turningMotorId, MotorType.kBrushless);
-
         driveMotor.configAllSettings(driveConfig);
         turningMotor.configAllSettings(steerConfig);
 
         driveMotor.setInverted(driveMotorReversed);
         turningMotor.setInverted(turningMotorReversed);
 
-        // driveEncoder = driveMotor.getEncoder();
-        // turningEncoder = turningMotor.getEncoder();
-
-        // driveEncoder.setPositionConversionFactor(ModuleConstants.kDriveEncoderRot2Meter);
-        // driveEncoder.setVelocityConversionFactor(ModuleConstants.kDriveEncoderRPM2MeterPerSec);
-        // turningEncoder.setPositionConversionFactor(ModuleConstants.kTurningEncoderRot2Rad);
-        // turningEncoder.setVelocityConversionFactor(ModuleConstants.kTurningEncoderRPM2RadPerSec);
-
-        turningPidController = new PIDController(ModuleConstants.kPTurning, 0, 0);
+        turningPidController = new PIDController(ModuleConstants.kPTurning, 0.001, 0);
         turningPidController.enableContinuousInput(-Math.PI, Math.PI);
 
         resetEncoders();
@@ -123,45 +112,44 @@ public class SwerveModule {
         return new SwerveModulePosition(getDrivePosition(), new Rotation2d(getTurningPosition()));
     }
 
-    public void setPGain(double input) {
+    public void setKp(double input) {
         this.turningPidController.setP(input);
     }
 
     public void setDesiredState(SwerveModuleState state) {
-        if (Math.abs(state.speedMetersPerSecond) < 0.001) {
-            stop();
-            return;
-        }
-
         state = SwerveModuleState.optimize(state, getState().angle);
         driveMotor.set(ControlMode.PercentOutput,
                 state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
 
         double output = turningPidController.calculate(getTurningPosition(), state.angle.getRadians());
-        double thetaInput = (output / turningPidController.getSetpoint()) * 1;
+        double setpoint = turningPidController.getSetpoint();
+        if (setpoint == 0) {
+            setpoint = 0.0001;
+        }
+        double thetaInput = (output / setpoint) * 1;
+
+        if (thetaInput == Double.POSITIVE_INFINITY || thetaInput == Double.NEGATIVE_INFINITY) {
+            thetaInput = 0;
+        }
 
         turningMotor.set(ControlMode.PercentOutput,
-                output);
-        // driveMotor.set(state.speedMetersPerSecond /
-        // DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
-        // turningMotor.set(turningPidController.calculate(getTurningPosition(),
-        // state.angle.getRadians()));
-        SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] PID thetaInput", thetaInput);
-        SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] PID Setpoint",
-                turningPidController.getSetpoint());
-        SmartDashboard.putString("Swerve[" + canCoder.getDeviceID() + "] state", state.toString());
-        SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] PID Output", output);
+                thetaInput);
+        SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] T",
+                thetaInput);
+        SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] Angle", state.angle.getRadians());
+        SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] Angle Direct",
+                getTurningPosition());
     }
 
     public void printDebug() {
-        SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] Turing Position", getTurningPosition());
-        SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] Turing Position Raw",
-                this.turningMotor.getSelectedSensorPosition());
-
-        SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] CANCoder Angle",
-                this.canCoder.getPosition());
-        SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] CANCoder Angle Raw",
-                this.canCoder.getAbsolutePosition());
+        // SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] Turing
+        // Position", getTurningPosition());
+        // SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] Turing
+        // Position Raw",
+        // this.turningMotor.getSelectedSensorPosition());
+        // SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] CANCoder
+        // Angle",
+        // this.canCoder.getPosition());
     }
 
     public void stop() {

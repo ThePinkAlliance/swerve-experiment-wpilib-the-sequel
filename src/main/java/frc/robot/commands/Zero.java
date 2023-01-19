@@ -16,7 +16,7 @@ public class Zero extends CommandBase {
 
     this.subsystem = sub;
 
-    addRequirements(subsystem);
+    addRequirements(sub);
   }
 
   // Called when the command is initially scheduled.
@@ -27,7 +27,7 @@ public class Zero extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    subsystem.setAllHeadings(0);
+    subsystem.setAllHeadings(100);
   }
 
   // Called once the command ends or is interrupted.

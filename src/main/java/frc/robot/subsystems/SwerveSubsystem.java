@@ -94,10 +94,21 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void setAllHeadings(double heading) {
-        frontLeft.setDesiredState(new SwerveModuleState(0, new Rotation2d(heading)));
-        frontRight.setDesiredState(new SwerveModuleState(0, new Rotation2d(heading)));
-        backLeft.setDesiredState(new SwerveModuleState(0, new Rotation2d(heading)));
-        backRight.setDesiredState(new SwerveModuleState(0, new Rotation2d(heading)));
+        frontLeft.setDesiredState(
+                new SwerveModuleState(frontLeft.getState().speedMetersPerSecond, new Rotation2d(heading)));
+        frontRight.setDesiredState(
+                new SwerveModuleState(frontRight.getState().speedMetersPerSecond, new Rotation2d(heading)));
+        backLeft.setDesiredState(
+                new SwerveModuleState(backLeft.getState().speedMetersPerSecond, new Rotation2d(heading)));
+        backRight.setDesiredState(
+                new SwerveModuleState(backRight.getState().speedMetersPerSecond, new Rotation2d(heading)));
+    }
+
+    public void setKp(double kP) {
+        frontLeft.setKp(kP);
+        frontRight.setKp(kP);
+        backLeft.setKp(kP);
+        backRight.setKp(kP);
     }
 
     @Override
@@ -109,17 +120,10 @@ public class SwerveSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Robot Heading", getHeading());
         SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
 
-        double p = SmartDashboard.getNumber("p", Constants.ModuleConstants.kPTurning);
-
         frontLeft.printDebug();
         frontRight.printDebug();
         backLeft.printDebug();
         backRight.printDebug();
-
-        frontLeft.setPGain(p);
-        frontRight.setPGain(p);
-        backLeft.setPGain(p);
-        backRight.setPGain(p);
     }
 
     public void stopModules() {
