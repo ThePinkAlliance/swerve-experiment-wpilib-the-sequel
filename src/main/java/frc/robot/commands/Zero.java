@@ -27,7 +27,7 @@ public class Zero extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    subsystem.setAllHeadings(100);
+    subsystem.setAllHeadings(Math.toRadians(0));
   }
 
   // Called once the command ends or is interrupted.

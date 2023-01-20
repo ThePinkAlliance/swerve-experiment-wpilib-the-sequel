@@ -35,7 +35,8 @@ public class SwerveModule {
     private final boolean absoluteEncoderReversed;
     private final double absoluteEncoderOffsetRad;
 
-    public SwerveModule(int driveMotorId, int turningMotorId, boolean driveMotorReversed, boolean turningMotorReversed,
+    public SwerveModule(int driveMotorId, int turningMotorId, boolean driveMotorReversed,
+            boolean turningEncoderReversed,
             int absoluteEncoderId, double absoluteEncoderOffset, boolean absoluteEncoderReversed) {
 
         this.absoluteEncoderOffsetRad = absoluteEncoderOffset;
@@ -44,7 +45,7 @@ public class SwerveModule {
         this.driveConfig = new TalonFXConfiguration();
         // absoluteEncoder = new AnalogInput(absoluteEncoderId);
         canCoder = new CANCoder(absoluteEncoderId);
-        canCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
+        canCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
 
         driveMotor = new TalonFX(driveMotorId);
         turningMotor = new TalonFX(turningMotorId);
@@ -53,9 +54,8 @@ public class SwerveModule {
         turningMotor.configAllSettings(steerConfig);
 
         driveMotor.setInverted(driveMotorReversed);
-        turningMotor.setInverted(turningMotorReversed);
 
-        turningPidController = new PIDController(ModuleConstants.kPTurning, 0.001, 0);
+        turningPidController = new PIDController(ModuleConstants.kPTurning, 0.2, 0);
         turningPidController.enableContinuousInput(-Math.PI, Math.PI);
 
         resetEncoders();
@@ -67,12 +67,8 @@ public class SwerveModule {
     }
 
     public double getTurningPosition() {
-        return Math.toRadians(canCoder.getAbsolutePosition());
-        // return (turningMotor.getSelectedSensorPosition() /
-        // Constants.ModuleConstants.kTurningMotorGearRatio) * 0.001559;
-        // return turningMotor.getSelectedSensorPosition() *
-        // ModuleConstants.kTurningEncoderRot2Rad;
-        // return turningEncoder.getPosition();
+        return Math.toRadians(canCoder.getAbsolutePosition())
+                - absoluteEncoderOffsetRad;
     }
 
     public double getDriveVelocity() {
@@ -82,10 +78,6 @@ public class SwerveModule {
 
     public double getTurningVelocity() {
         return Math.toRadians(canCoder.getVelocity());
-        // return turningMotor.getSelectedSensorVelocity() * 0.003068;
-        // return turningMotor.getSelectedSensorVelocity() *
-        // ModuleConstants.kTurningEncoderRPM2RadPerSec;
-        // return turningEncoder.getVelocity();
     }
 
     public double getAbsoluteEncoderRad() {
@@ -100,8 +92,6 @@ public class SwerveModule {
     public void resetEncoders() {
         driveMotor.setSelectedSensorPosition(0);
         turningMotor.setSelectedSensorPosition(getAbsoluteEncoderRad());
-        // driveEncoder.setPosition(0);
-        // turningEncoder.setPosition(getAbsoluteEncoderRad());
     }
 
     public SwerveModuleState getState() {
@@ -126,30 +116,23 @@ public class SwerveModule {
         if (setpoint == 0) {
             setpoint = 0.0001;
         }
-        double thetaInput = (output / setpoint) * 1;
+        // double thetaInput = (output / setpoint) * 1.1;
+        // double thetaInput = (output - setpoint) / (2 * Math.PI);
 
-        if (thetaInput == Double.POSITIVE_INFINITY || thetaInput == Double.NEGATIVE_INFINITY) {
-            thetaInput = 0;
-        }
+        // if (thetaInput == Double.POSITIVE_INFINITY || thetaInput ==
+        // Double.NEGATIVE_INFINITY) {
+        // thetaInput = 0;
+        // }
 
         turningMotor.set(ControlMode.PercentOutput,
-                thetaInput);
-        SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] T",
-                thetaInput);
-        SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] Angle", state.angle.getRadians());
-        SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] Angle Direct",
-                getTurningPosition());
+                output);
+        SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] Controller out", output);
+        SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] Desired Angle", state.angle.getRadians());
     }
 
     public void printDebug() {
-        // SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] Turing
-        // Position", getTurningPosition());
-        // SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] Turing
-        // Position Raw",
-        // this.turningMotor.getSelectedSensorPosition());
-        // SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] CANCoder
-        // Angle",
-        // this.canCoder.getPosition());
+        SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] Current Angle",
+                getTurningPosition());
     }
 
     public void stop() {
