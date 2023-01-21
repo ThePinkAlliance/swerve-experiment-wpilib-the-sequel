@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
@@ -50,12 +51,14 @@ public class SwerveModule {
         driveMotor = new TalonFX(driveMotorId);
         turningMotor = new TalonFX(turningMotorId);
 
+        turningMotor.setNeutralMode(NeutralMode.Brake);
+
         driveMotor.configAllSettings(driveConfig);
         turningMotor.configAllSettings(steerConfig);
 
         driveMotor.setInverted(driveMotorReversed);
 
-        turningPidController = new PIDController(ModuleConstants.kPTurning, 0.2, 0);
+        turningPidController = new PIDController(ModuleConstants.kPTurning, 0.5, 0);
         turningPidController.enableContinuousInput(-Math.PI, Math.PI);
 
         resetEncoders();
@@ -67,8 +70,9 @@ public class SwerveModule {
     }
 
     public double getTurningPosition() {
-        return Math.toRadians(canCoder.getAbsolutePosition())
-                - absoluteEncoderOffsetRad;
+        double rad = Math.toRadians(canCoder.getAbsolutePosition()) - absoluteEncoderOffsetRad;
+
+        return rad;
     }
 
     public double getDriveVelocity() {
