@@ -8,6 +8,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
@@ -19,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.Navigate;
 import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.commands.Zero;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -35,14 +37,22 @@ public class RobotContainer {
                                 () -> -driverJoytick.getRawAxis(OIConstants.kDriverYAxis),
                                 () -> -driverJoytick.getRawAxis(OIConstants.kDriverXAxis),
                                 () -> driverJoytick.getRawAxis(OIConstants.kDriverRotAxis),
-                                () -> driverJoytick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx)));
+                                () -> !driverJoytick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx)));
 
                 configureButtonBindings();
+                SmartDashboard.putNumber("distance", 1);
         }
 
         private void configureButtonBindings() {
+                new JoystickButton(driverJoytick, 4).onTrue(
+                                new Navigate(swerveSubsystem, new SwerveModulePosition(getDistance(), new Rotation2d()),
+                                                1));
                 new JoystickButton(driverJoytick, 3).onTrue(new InstantCommand(() -> swerveSubsystem.zeroHeading()));
                 new JoystickButton(driverJoytick, 2).onTrue(new Zero(swerveSubsystem));
+        }
+
+        private double getDistance() {
+                return SmartDashboard.getNumber("distance", 1);
         }
 
         public Command getAutonomousCommand() {

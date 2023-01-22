@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import java.util.List;
+
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -78,6 +80,11 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public double getHeading() {
         return Math.IEEEremainder(gyro.getAngle(), 360);
+    }
+
+    public List<SwerveModulePosition> getPositions() {
+        return List.of(frontLeft.getPosition(), frontRight.getPosition(), backLeft.getPosition(),
+                backRight.getPosition());
     }
 
     public Rotation2d getRotation2d() {

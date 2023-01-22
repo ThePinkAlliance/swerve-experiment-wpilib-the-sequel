@@ -44,9 +44,10 @@ public class SwerveModule {
         this.absoluteEncoderReversed = absoluteEncoderReversed;
         this.steerConfig = new TalonFXConfiguration();
         this.driveConfig = new TalonFXConfiguration();
-        // absoluteEncoder = new AnalogInput(absoluteEncoderId);
         canCoder = new CANCoder(absoluteEncoderId);
-        canCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Unsigned_0_to_360);
+
+        // Changed from 360 to 180 no change in pod behvior was noticed.
+        canCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
 
         driveMotor = new TalonFX(driveMotorId);
         turningMotor = new TalonFX(turningMotorId);
@@ -65,8 +66,10 @@ public class SwerveModule {
     }
 
     public double getDrivePosition() {
-        return driveMotor.getSelectedSensorPosition() * 0.0001559;
-        // return driveEncoder.getPosition();
+        // return (driveMotor.getSelectedSensorPosition() * 0.0001559) *
+        // Constants.ModuleConstants.kDriveMotorGearRatio;
+        return ((driveMotor.getSelectedSensorPosition() / 2048.0) * Constants.ModuleConstants.kDriveMotorGearRatio)
+                * Constants.ModuleConstants.kWheelDiameterMeters * Math.PI;
     }
 
     public double getTurningPosition() {
@@ -116,17 +119,6 @@ public class SwerveModule {
                 state.speedMetersPerSecond / DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
 
         double output = turningPidController.calculate(getTurningPosition(), state.angle.getRadians());
-        double setpoint = turningPidController.getSetpoint();
-        if (setpoint == 0) {
-            setpoint = 0.0001;
-        }
-        // double thetaInput = (output / setpoint) * 1.1;
-        // double thetaInput = (output - setpoint) / (2 * Math.PI);
-
-        // if (thetaInput == Double.POSITIVE_INFINITY || thetaInput ==
-        // Double.NEGATIVE_INFINITY) {
-        // thetaInput = 0;
-        // }
 
         turningMotor.set(ControlMode.PercentOutput,
                 output);
@@ -137,6 +129,9 @@ public class SwerveModule {
     public void printDebug() {
         SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] Current Angle",
                 getTurningPosition());
+
+        SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] Current Distance",
+                getPosition().distanceMeters);
     }
 
     public void stop() {
