@@ -12,7 +12,6 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 
 public class SwerveSubsystem extends SubsystemBase {
@@ -60,10 +59,6 @@ public class SwerveSubsystem extends SubsystemBase {
                     new SwerveModulePosition() },
             new Pose2d());
 
-    // private final SwerveDriveOdometry odometer = new
-    // SwerveDriveOdometry(DriveConstants.kDriveKinematics,
-    // new Rotation2d(0));
-
     public SwerveSubsystem() {
         new Thread(() -> {
             try {
@@ -96,8 +91,10 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void resetOdometry(Pose2d pose) {
-        odometer.resetPosition(getRotation2d(), new SwerveModulePosition[] {}, pose);
-        // odometer.resetPosition(pose, getRotation2d());
+        odometer.resetPosition(getRotation2d(), new SwerveModulePosition[] { new SwerveModulePosition(),
+                new SwerveModulePosition(),
+                new SwerveModulePosition(),
+                new SwerveModulePosition() }, pose);
     }
 
     public void setAllHeadings(double heading) {
@@ -142,8 +139,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
-        // SwerveDriveKinematics.normalizeWheelSpeeds(desiredStates,
-        // DriveConstants.kPhysicalMaxSpeedMetersPerSecond);
         frontLeft.setDesiredState(desiredStates[0]);
         frontRight.setDesiredState(desiredStates[1]);
         backLeft.setDesiredState(desiredStates[2]);
