@@ -45,7 +45,7 @@ public class RobotContainer {
 
         private void configureButtonBindings() {
                 new JoystickButton(driverJoytick, 4).onTrue(
-                                new Navigate(swerveSubsystem, new SwerveModulePosition(getDistance(), new Rotation2d()),
+                                new Navigate(swerveSubsystem, new SwerveModulePosition(1.524, new Rotation2d()),
                                                 1));
                 new JoystickButton(driverJoytick, 3).onTrue(new InstantCommand(() -> swerveSubsystem.zeroHeading()));
                 new JoystickButton(driverJoytick, 2).onTrue(new Zero(swerveSubsystem));

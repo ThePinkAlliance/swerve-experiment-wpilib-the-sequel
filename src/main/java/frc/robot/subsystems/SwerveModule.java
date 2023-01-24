@@ -45,6 +45,7 @@ public class SwerveModule {
         turningMotor = new TalonFX(turningMotorId);
 
         turningMotor.setNeutralMode(NeutralMode.Brake);
+        driveMotor.setNeutralMode(NeutralMode.Brake);
 
         driveMotor.configAllSettings(driveConfig);
         turningMotor.configAllSettings(steerConfig);

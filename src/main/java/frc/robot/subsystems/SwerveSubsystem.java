@@ -97,6 +97,9 @@ public class SwerveSubsystem extends SubsystemBase {
                 new SwerveModulePosition() }, pose);
     }
 
+    /*
+     * Set the heading of all the swerve pods.
+     */
     public void setAllHeadings(double heading) {
         frontLeft.setDesiredState(
                 new SwerveModuleState(frontLeft.getState().speedMetersPerSecond, new Rotation2d(heading)));
