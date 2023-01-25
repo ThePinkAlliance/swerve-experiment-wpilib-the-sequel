@@ -5,8 +5,8 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -58,10 +58,18 @@ public class SwerveJoystickCmd extends CommandBase {
         // 4. Construct desired chassis speeds
         ChassisSpeeds chassisSpeeds;
         if (fieldOrientedFunction.get()) {
-            // Relative to field
+            /**
+             * Relative to field
+             * 
+             * Rotating and driving forward works however you can't rotate and strafe that's
+             * an issue that needs to be solved.
+             */
             Rotation2d robotAngle = swerveSubsystem.getRotation2d();
             double x = xSpeed * robotAngle.getCos() + ySpeed * robotAngle.getSin();
-            double y = xSpeed * robotAngle.getSin() + ySpeed * robotAngle.getCos();
+            double y = xSpeed * robotAngle.getSin() + ySpeed * -robotAngle.getCos();
+
+            SmartDashboard.putNumber("x_speed", x);
+            SmartDashboard.putNumber("y_speed", y);
 
             chassisSpeeds = new ChassisSpeeds(x, y, turningSpeed);
         } else {

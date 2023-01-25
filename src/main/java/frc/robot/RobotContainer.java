@@ -2,6 +2,8 @@ package frc.robot;
 
 import java.util.List;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -12,6 +14,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -28,31 +31,43 @@ import frc.robot.subsystems.SwerveSubsystem;
 public class RobotContainer {
 
         private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
-
+        private final ShuffleboardTab debugTab = Shuffleboard.getTab("debug");
         private final Joystick driverJoytick = new Joystick(OIConstants.kDriverControllerPort);
+
+        PIDController xController = new PIDController(AutoConstants.kPXController, 0, 0);
+        PIDController yController = new PIDController(AutoConstants.kPYController, 0, 0);
+        ProfiledPIDController thetaController = new ProfiledPIDController(
+                        AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
 
         public RobotContainer() {
                 swerveSubsystem.setDefaultCommand(new SwerveJoystickCmd(
                                 swerveSubsystem,
                                 () -> -driverJoytick.getRawAxis(OIConstants.kDriverYAxis),
-                                () -> -driverJoytick.getRawAxis(OIConstants.kDriverXAxis),
+                                () -> driverJoytick.getRawAxis(OIConstants.kDriverXAxis),
                                 () -> driverJoytick.getRawAxis(OIConstants.kDriverRotAxis),
                                 () -> !driverJoytick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx)));
 
+                thetaController.enableContinuousInput(-Math.PI, Math.PI);
+
                 configureButtonBindings();
-                SmartDashboard.putNumber("distance", 1);
+
+                debugTab.add(xController);
+                debugTab.add(yController);
+                debugTab.add(thetaController);
+
+                SmartDashboard.putNumber("distance", 1.524);
         }
 
         private void configureButtonBindings() {
                 new JoystickButton(driverJoytick, 4).onTrue(
-                                new Navigate(swerveSubsystem, new SwerveModulePosition(1.524, new Rotation2d()),
+                                new Navigate(swerveSubsystem, new SwerveModulePosition(getDistance(), new Rotation2d()),
                                                 1));
                 new JoystickButton(driverJoytick, 3).onTrue(new InstantCommand(() -> swerveSubsystem.zeroHeading()));
                 new JoystickButton(driverJoytick, 2).onTrue(new Zero(swerveSubsystem));
         }
 
         private double getDistance() {
-                return SmartDashboard.getNumber("distance", 1);
+                return SmartDashboard.getNumber("distance", 1.524);
         }
 
         public Command getAutonomousCommand() {
@@ -72,11 +87,7 @@ public class RobotContainer {
                                 trajectoryConfig);
 
                 // 3. Define PID controllers for tracking trajectory
-                PIDController xController = new PIDController(AutoConstants.kPXController, 0, 0);
-                PIDController yController = new PIDController(AutoConstants.kPYController, 0, 0);
-                ProfiledPIDController thetaController = new ProfiledPIDController(
-                                AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
-                thetaController.enableContinuousInput(-Math.PI, Math.PI);
+                // Empty...
 
                 // 4. Construct command to follow trajectory
                 SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
