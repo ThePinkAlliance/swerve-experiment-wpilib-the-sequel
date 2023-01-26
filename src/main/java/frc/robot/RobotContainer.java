@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.math.trajectory.Trajectory.State;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -80,11 +81,21 @@ public class RobotContainer {
                 // 2. Generate trajectory
                 Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
                                 new Pose2d(0, 0, new Rotation2d(0)),
-                                List.of(
-                                                new Translation2d(1, 0),
-                                                new Translation2d(1, -1)),
-                                new Pose2d(2, -1, Rotation2d.fromDegrees(180)),
+                                List.of(new Translation2d(
+                                                0.762, 0),
+                                                new Translation2d(
+                                                                1.0,
+                                                                0),
+                                                new Translation2d(
+                                                                1.2,
+                                                                0)),
+                                new Pose2d(1.524, 0, Rotation2d.fromDegrees(0)),
                                 trajectoryConfig);
+
+                for (State state : trajectory.getStates()) {
+                        System.out.println(state.toString());
+                }
+                System.out.println("\n");
 
                 // 3. Define PID controllers for tracking trajectory
                 // Empty...
@@ -100,9 +111,10 @@ public class RobotContainer {
                                 swerveSubsystem::setModuleStates,
                                 swerveSubsystem);
 
+                swerveSubsystem.resetOdometry(trajectory.getInitialPose());
+
                 // 5. Add some init and wrap-up, and return everything
                 return new SequentialCommandGroup(
-                                new InstantCommand(() -> swerveSubsystem.resetOdometry(trajectory.getInitialPose())),
                                 swerveControllerCommand,
                                 new InstantCommand(() -> swerveSubsystem.stopModules()));
         }
