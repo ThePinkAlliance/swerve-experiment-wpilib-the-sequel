@@ -81,29 +81,17 @@ public class RobotContainer {
                 // 2. Generate trajectory
                 Trajectory trajectory = TrajectoryGenerator.generateTrajectory(
                                 new Pose2d(0, 0, new Rotation2d(0)),
-                                List.of(new Translation2d(
-                                                0.762, 0),
-                                                new Translation2d(
-                                                                1.0,
-                                                                0),
-                                                new Translation2d(
-                                                                1.2,
-                                                                0)),
+                                List.of(),
                                 new Pose2d(1.524, 0, Rotation2d.fromDegrees(0)),
                                 trajectoryConfig);
-
-                for (State state : trajectory.getStates()) {
-                        System.out.println(state.toString());
-                }
-                System.out.println("\n");
 
                 // 3. Define PID controllers for tracking trajectory
                 // Empty...
 
                 // 4. Construct command to follow trajectory
-                SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
+                SwerveController swerveControllerCommand = new SwerveController(
                                 trajectory,
-                                swerveSubsystem::getPose,
+                                () -> swerveSubsystem.getPose(),
                                 DriveConstants.kDriveKinematics,
                                 xController,
                                 yController,
@@ -114,8 +102,6 @@ public class RobotContainer {
                 swerveSubsystem.resetOdometry(trajectory.getInitialPose());
 
                 // 5. Add some init and wrap-up, and return everything
-                return new SequentialCommandGroup(
-                                swerveControllerCommand,
-                                new InstantCommand(() -> swerveSubsystem.stopModules()));
+                return swerveControllerCommand.andThen(() -> swerveSubsystem.stopModules());
         }
 }
