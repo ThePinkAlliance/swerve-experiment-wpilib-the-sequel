@@ -27,6 +27,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.commands.Navigate;
 import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.commands.Zero;
+import frc.robot.subsystems.Limelight;
 import frc.robot.subsystems.SwerveSubsystem;
 
 public class RobotContainer {
@@ -34,6 +35,7 @@ public class RobotContainer {
         private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
         private final ShuffleboardTab debugTab = Shuffleboard.getTab("debug");
         private final Joystick driverJoytick = new Joystick(OIConstants.kDriverControllerPort);
+        private final Limelight limelight = new Limelight();
 
         PIDController xController = new PIDController(AutoConstants.kPXController, 0, 0);
         PIDController yController = new PIDController(AutoConstants.kPYController, 0, 0);
