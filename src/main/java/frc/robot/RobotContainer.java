@@ -25,6 +25,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.Navigate;
+import frc.robot.commands.NavigateHolo;
 import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.commands.Zero;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -88,6 +89,8 @@ public class RobotContainer {
                 // 3. Define PID controllers for tracking trajectory
                 // Empty...
 
+                NavigateHolo holo = new NavigateHolo(trajectory, swerveSubsystem);
+
                 // 4. Construct command to follow trajectory
                 SwerveController swerveControllerCommand = new SwerveController(
                                 trajectory,
@@ -102,6 +105,6 @@ public class RobotContainer {
                 swerveSubsystem.resetOdometry(trajectory.getInitialPose());
 
                 // 5. Add some init and wrap-up, and return everything
-                return swerveControllerCommand.andThen(() -> swerveSubsystem.stopModules());
+                return holo;
         }
 }
