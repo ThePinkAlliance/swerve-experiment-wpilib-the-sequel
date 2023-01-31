@@ -1,7 +1,9 @@
 {
   "NTProvider": {
     "types": {
-      "/FMSInfo": "FMSInfo"
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/debug/PIDController[5]": "PIDController",
+      "/Shuffleboard/debug/PIDController[6]": "PIDController"
     }
   }
 }

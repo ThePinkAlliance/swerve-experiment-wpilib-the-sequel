@@ -58,6 +58,8 @@ public class SwerveJoystickCmd extends CommandBase {
         // 4. Construct desired chassis speeds
         ChassisSpeeds chassisSpeeds;
         if (fieldOrientedFunction.get()) {
+            ySpeed = ySpeed * -1.0;
+
             /**
              * Relative to field
              * 

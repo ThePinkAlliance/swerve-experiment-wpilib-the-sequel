@@ -7,7 +7,6 @@ package frc.robot;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import edu.wpi.first.math.controller.HolonomicDriveController;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -17,6 +16,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 
@@ -25,7 +25,7 @@ public class SwerveController extends CommandBase {
   private final Trajectory m_trajectory;
   private final Supplier<Pose2d> m_pose;
   private final SwerveDriveKinematics m_kinematics;
-  private final HolonomicDriveController m_controller;
+  private final PinkHolonomicController m_controller;
   private final Consumer<SwerveModuleState[]> m_outputModuleStates;
   private final Supplier<Rotation2d> m_desiredRotation;
   private double lastTime;
@@ -75,7 +75,7 @@ public class SwerveController extends CommandBase {
         trajectory,
         pose,
         kinematics,
-        new HolonomicDriveController(
+        new PinkHolonomicController(
             requireNonNullParam(xController, "xController", "SwerveController"),
             requireNonNullParam(yController, "yController", "SwerveController"),
             requireNonNullParam(thetaController, "thetaController", "SwerveController")),
@@ -167,7 +167,7 @@ public class SwerveController extends CommandBase {
    *                           of the odometry classes to
    *                           provide this.
    * @param kinematics         The kinematics for the robot drivetrain.
-   * @param controller         The HolonomicDriveController for the drivetrain.
+   * @param controller         The PinkHOl for the drivetrain.
    * @param outputModuleStates The raw output module states from the position
    *                           controllers.
    * @param requirements       The subsystems to require.
@@ -176,7 +176,7 @@ public class SwerveController extends CommandBase {
       Trajectory trajectory,
       Supplier<Pose2d> pose,
       SwerveDriveKinematics kinematics,
-      HolonomicDriveController controller,
+      PinkHolonomicController controller,
       Consumer<SwerveModuleState[]> outputModuleStates,
       Subsystem... requirements) {
     this(
@@ -206,7 +206,7 @@ public class SwerveController extends CommandBase {
    *                           of the odometry classes to
    *                           provide this.
    * @param kinematics         The kinematics for the robot drivetrain.
-   * @param controller         The HolonomicDriveController for the drivetrain.
+   * @param controller         The PinkHOl for the drivetrain.
    * @param desiredRotation    The angle that the drivetrain should be facing.
    *                           This is sampled at each
    *                           time step.
@@ -218,7 +218,7 @@ public class SwerveController extends CommandBase {
       Trajectory trajectory,
       Supplier<Pose2d> pose,
       SwerveDriveKinematics kinematics,
-      HolonomicDriveController controller,
+      PinkHolonomicController controller,
       Supplier<Rotation2d> desiredRotation,
       Consumer<SwerveModuleState[]> outputModuleStates,
       Subsystem... requirements) {
@@ -245,8 +245,6 @@ public class SwerveController extends CommandBase {
     double curTime = m_timer.get();
     var desiredState = m_trajectory.sample(curTime);
 
-    System.out.println("Command Freq: " + (curTime - lastTime));
-
     var targetChassisSpeeds = m_controller.calculate(m_pose.get(), desiredState, m_desiredRotation.get());
     var targetModuleStates = m_kinematics.toSwerveModuleStates(targetChassisSpeeds);
 
@@ -261,6 +259,12 @@ public class SwerveController extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return m_timer.hasElapsed(m_trajectory.getTotalTimeSeconds());
+    boolean finished = m_timer.hasElapsed(m_trajectory.getTotalTimeSeconds());
+
+    if (finished) {
+      System.out.println("Finished: " + m_timer.get() + ", At ref: " + m_controller.atReference());
+    }
+
+    return finished;
   }
 }
