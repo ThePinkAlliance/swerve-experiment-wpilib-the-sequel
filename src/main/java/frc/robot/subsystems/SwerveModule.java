@@ -63,7 +63,7 @@ public class SwerveModule {
      */
     public double getDrivePosition() {
         return ((driveMotor.getSelectedSensorPosition() / 2048.0) * Constants.ModuleConstants.kDriveMotorGearRatio)
-                * Constants.ModuleConstants.kWheelDiameterMeters * Math.PI;
+                * (Constants.ModuleConstants.kWheelDiameterMeters * Math.PI);
     }
 
     /*

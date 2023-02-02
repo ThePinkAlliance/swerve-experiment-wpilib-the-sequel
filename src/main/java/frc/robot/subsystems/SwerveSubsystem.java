@@ -97,10 +97,15 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void resetOdometry(Pose2d pose) {
-        odometer.resetPosition(getRotation2d(), new SwerveModulePosition[] { new SwerveModulePosition(),
-                new SwerveModulePosition(),
-                new SwerveModulePosition(),
-                new SwerveModulePosition() }, pose);
+        odometer.resetPosition(getRotation2d(),
+                new SwerveModulePosition[] { frontLeft
+                        .getPosition(),
+                        frontRight
+                                .getPosition(),
+                        backLeft.getPosition(),
+                        backRight
+                                .getPosition() },
+                pose);
     }
 
     /*
