@@ -15,7 +15,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
  */
 public class PhotonVisionCamera implements CameraInterface {
     private PhotonCamera camera;
-    private static String cameraName = "main";
+    private static String cameraName = "OV5647";
 
     public PhotonVisionCamera() {
         camera = new PhotonCamera(cameraName);
@@ -116,7 +116,12 @@ public class PhotonVisionCamera implements CameraInterface {
 
         // Now add the targets
         for (PhotonTrackedTarget target : photonTargets) {
-            camTargets.addAprilTagTarget(target.getFiducialId(), target.getYaw(), target.getPitch(), target.getBestCameraToTarget().getX());
+            double zAngle = target.getBestCameraToTarget().getZ();
+            double computedZAngle = 0;
+            if (zAngle < 0) computedZAngle = -180 + computedZAngle;
+            else computedZAngle = 180 - computedZAngle;
+            camTargets.addAprilTagTarget(target.getFiducialId(), target.getYaw(), target.getPitch(), 
+                computedZAngle, target.getBestCameraToTarget().getX());
         }
     }
 

@@ -10,11 +10,20 @@ import frc.robot.subsystems.camera.PhotonVisionCamera;
 import frc.robot.subsystems.camera.CameraInterface.PipelineType;
 
 public class CameraSubsystem extends SubsystemBase {
-    //private CameraInterface camera = new PhotonVisionCamera();
-    private CameraInterface camera = new LimeLightCamera();
+    /**
+     * Camera type.
+     */
+    public enum CameraType {
+        LIMELIGHT,
+        PHOTON_VISION
+    }
+
+    private CameraInterface camera;
     
-    public CameraSubsystem() {
+    public CameraSubsystem(CameraType type) {
         if (!Robot.isReal()) camera = new CameraInterfaceSim();
+        else if (type == CameraType.PHOTON_VISION) camera = new PhotonVisionCamera();
+        else camera = new LimeLightCamera();
     }
 
     /**
