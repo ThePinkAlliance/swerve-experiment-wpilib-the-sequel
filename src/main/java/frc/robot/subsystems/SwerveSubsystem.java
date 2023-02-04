@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -151,6 +152,10 @@ public class SwerveSubsystem extends SubsystemBase {
         frontRight.stop();
         backLeft.stop();
         backRight.stop();
+    }
+
+    public void move(double vx, double vy, double radsPerSecond) {
+        setModuleStates(Constants.DriveConstants.kDriveKinematics.toSwerveModuleStates(new ChassisSpeeds(vx, vy, radsPerSecond)));
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {

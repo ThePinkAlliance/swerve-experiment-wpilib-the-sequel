@@ -25,9 +25,11 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.AutoCommandGroup;
 import frc.robot.commands.Navigate;
 import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.commands.Zero;
+import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 
 public class RobotContainer {
@@ -36,6 +38,7 @@ public class RobotContainer {
         private final ShuffleboardTab debugTab = Shuffleboard.getTab("debug");
         private Trajectory trajectory = null;
         private final Joystick driverJoytick = new Joystick(OIConstants.kDriverControllerPort);
+        private final CameraSubsystem cameraSubsystem = new CameraSubsystem();
 
         PIDController xController = new PIDController(AutoConstants.kPXController, 0.5, 0);
         PIDController yController = new PIDController(AutoConstants.kPYController, 0, 0);
