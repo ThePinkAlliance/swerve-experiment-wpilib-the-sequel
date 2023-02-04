@@ -12,6 +12,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
@@ -83,9 +84,9 @@ public class RobotContainer {
 
         public Command getAutonomousCommand() {
                 // 1. Create trajectory settings
-                TrajectoryConfig trajectoryConfig = new TrajectoryConfig(
-                                AutoConstants.kMaxSpeedMetersPerSecond,
-                                AutoConstants.kMaxAccelerationMetersPerSecondSquared)
+                TrajectoryConfig trajectoryConfig2 = new TrajectoryConfig(
+                                AutoConstants.kMaxSpeedMetersPerSecond * 0.5,
+                                1)
                                 .setKinematics(DriveConstants.kDriveKinematics);
 
                 // 2. Generate trajectory
@@ -93,19 +94,16 @@ public class RobotContainer {
                 if (trajectory == null) {
                         trajectory = TrajectoryGenerator.generateTrajectory(
                                         new Pose2d(0, 0, new Rotation2d(0)),
-                                        List.of(),
-                                        new Pose2d(2, 0,
+                                        List.of(
+                                                        new Translation2d(2.5, 0),
+                                                        new Translation2d(3, 0)),
+                                        new Pose2d(4.7, 0,
                                                         Rotation2d.fromDegrees(0)),
-                                        trajectoryConfig);
+                                        trajectoryConfig2);
                 }
 
-                // SmartDashboard.putString("InitalPose Before Reset",
-                // swerveSubsystem.getPose().toString());
-
-                // SmartDashboard.putString("EndPose", trajectory.getStates());
-
-                // 3. Define PID controllers for tracking trajectory
-                // Empty...
+                // Reset the swerve subsystem pose to the inital pose of the trajectory.
+                swerveSubsystem.resetOdometry(trajectory.getInitialPose());
 
                 // 4. Construct command to follow trajectory
                 SwerveController swerveControllerCommand = new SwerveController(
@@ -120,8 +118,6 @@ public class RobotContainer {
 
                 // 5. Add some init and wrap-up, and return everything
                 return new SequentialCommandGroup(
-                                new InstantCommand(() -> swerveSubsystem.resetOdometry(trajectory.getInitialPose()),
-                                                swerveSubsystem),
                                 new InstantCommand(() -> SmartDashboard.putString("InitalPose",
                                                 swerveSubsystem.getPose()
                                                                 .toString()),
