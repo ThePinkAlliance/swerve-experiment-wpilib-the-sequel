@@ -66,7 +66,7 @@ public class RobotContainer {
                         err.printStackTrace();
                 }
 
-                SmartDashboard.putNumber("distance", 1.524);
+                SmartDashboard.putNumber("distance", 2);
         }
 
         private void configureButtonBindings() {
@@ -78,7 +78,7 @@ public class RobotContainer {
         }
 
         private double getDistance() {
-                return SmartDashboard.getNumber("distance", 1.524);
+                return SmartDashboard.getNumber("distance", 2);
         }
 
         public Command getAutonomousCommand() {
@@ -110,7 +110,7 @@ public class RobotContainer {
                 // 4. Construct command to follow trajectory
                 SwerveController swerveControllerCommand = new SwerveController(
                                 trajectory,
-                                () -> swerveSubsystem.getPose(),
+                                swerveSubsystem::getPose,
                                 DriveConstants.kDriveKinematics,
                                 xController,
                                 yController,
