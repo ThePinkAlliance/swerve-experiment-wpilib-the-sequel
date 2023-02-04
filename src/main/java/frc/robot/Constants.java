@@ -45,10 +45,10 @@ public final class Constants {
         public static final boolean kFrontRightTurningReversed = false;
         public static final boolean kBackRightTurningReversed = true;
 
-        public static final boolean kFrontLeftDriveEncoderReversed = true;
+        public static final boolean kFrontLeftDriveEncoderReversed = false;
         public static final boolean kBackLeftDriveEncoderReversed = false;
-        public static final boolean kFrontRightDriveEncoderReversed = false;
-        public static final boolean kBackRightDriveEncoderReversed = true;
+        public static final boolean kFrontRightDriveEncoderReversed = true;
+        public static final boolean kBackRightDriveEncoderReversed = false;
 
         public static final int kFrontLeftDriveAbsoluteEncoderPort = 3;
         public static final int kBackLeftDriveAbsoluteEncoderPort = 9;
@@ -64,16 +64,16 @@ public final class Constants {
          * These values where determined by lining up all the wheels and recording the
          * outputed positions.
          */
-        public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = 0.036;
-        public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = -1.08; // 1.9215
-        public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = 3.314;
-        public static final double kBackRightDriveAbsoluteEncoderOffsetRad = -3.10;
+        public static final double kFrontLeftDriveAbsoluteEncoderOffsetRad = -3.09;// 0.036;
+        public static final double kBackLeftDriveAbsoluteEncoderOffsetRad = -1.08;// -1.08; // 1.9215
+        public static final double kFrontRightDriveAbsoluteEncoderOffsetRad = 0.154;// 3.314;
+        public static final double kBackRightDriveAbsoluteEncoderOffsetRad = 0.018;// -3.10;
 
         // This is the max speed without load.
         public static final double kPhysicalMaxSpeedMetersPerSecond = 4.0;
         public static final double kPhysicalMaxAngularSpeedRadiansPerSecond = 2 * 2 * Math.PI;
 
-        public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond * 0.50;
+        public static final double kTeleDriveMaxSpeedMetersPerSecond = kPhysicalMaxSpeedMetersPerSecond * 0.75;
         public static final double kTeleDriveMaxAngularSpeedRadiansPerSecond = kPhysicalMaxAngularSpeedRadiansPerSecond
                 / 3;
         public static final double kTeleDriveMaxAccelerationUnitsPerSecond = 3;
@@ -81,14 +81,14 @@ public final class Constants {
     }
 
     public static final class AutoConstants {
-        public static final double kMaxSpeedMetersPerSecond = DriveConstants.kPhysicalMaxSpeedMetersPerSecond * 0.7;
+        public static final double kMaxSpeedMetersPerSecond = DriveConstants.kPhysicalMaxSpeedMetersPerSecond;
         public static final double kMaxAngularSpeedRadiansPerSecond = DriveConstants.kPhysicalMaxAngularSpeedRadiansPerSecond
-                * 0.5;
-        public static final double kMaxAccelerationMetersPerSecondSquared = 1;
+                * 0.35;
+        public static final double kMaxAccelerationMetersPerSecondSquared = 3;
         public static final double kMaxAngularAccelerationRadiansPerSecondSquared = Math.PI / 4;
-        public static final double kPXController = .6;
-        public static final double kPYController = .5;
-        public static final double kPThetaController = .5;
+        public static final double kPXController = 1.5;
+        public static final double kPYController = 1.5;
+        public static final double kPThetaController = 1.5;
 
         public static final TrapezoidProfile.Constraints kThetaControllerConstraints = //
                 new TrapezoidProfile.Constraints(

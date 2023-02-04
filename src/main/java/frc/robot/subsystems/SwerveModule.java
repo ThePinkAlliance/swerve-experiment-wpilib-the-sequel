@@ -27,6 +27,7 @@ public class SwerveModule {
     private final TalonFXConfiguration driveConfig;
     private final boolean absoluteEncoderReversed;
     private final double absoluteEncoderOffsetRad;
+    private boolean invertDriveEncoder = false;
 
     public SwerveModule(int driveMotorId, int turningMotorId, boolean driveMotorReversed,
             boolean turningEncoderReversed,
@@ -52,7 +53,39 @@ public class SwerveModule {
 
         driveMotor.setInverted(driveMotorReversed);
 
-        turningPidController = new PIDController(ModuleConstants.kPTurning, 0.5, 0);
+        turningPidController = new PIDController(ModuleConstants.kPTurning, 1.5, 0);
+        turningPidController.enableContinuousInput(-Math.PI, Math.PI);
+
+        resetEncoders();
+    }
+
+    public SwerveModule(int driveMotorId, int turningMotorId, boolean driveMotorReversed,
+            boolean turningEncoderReversed,
+            int absoluteEncoderId, double absoluteEncoderOffset, boolean absoluteEncoderReversed,
+            boolean invertDriveEncoder) {
+
+        this.absoluteEncoderOffsetRad = absoluteEncoderOffset;
+        this.invertDriveEncoder = invertDriveEncoder;
+        this.absoluteEncoderReversed = absoluteEncoderReversed;
+        this.steerConfig = new TalonFXConfiguration();
+        this.driveConfig = new TalonFXConfiguration();
+        canCoder = new CANCoder(absoluteEncoderId);
+
+        // Changed from 360 to 180 no change in pod behvior was noticed.
+        canCoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
+
+        driveMotor = new TalonFX(driveMotorId);
+        turningMotor = new TalonFX(turningMotorId);
+
+        turningMotor.setNeutralMode(NeutralMode.Brake);
+        driveMotor.setNeutralMode(NeutralMode.Brake);
+
+        driveMotor.configAllSettings(driveConfig);
+        turningMotor.configAllSettings(steerConfig);
+
+        driveMotor.setInverted(driveMotorReversed);
+
+        turningPidController = new PIDController(ModuleConstants.kPTurning, 1.5, 0);
         turningPidController.enableContinuousInput(-Math.PI, Math.PI);
 
         resetEncoders();
@@ -63,7 +96,7 @@ public class SwerveModule {
      */
     public double getDrivePosition() {
         return ((driveMotor.getSelectedSensorPosition() / 2048.0) * Constants.ModuleConstants.kDriveMotorGearRatio)
-                * Constants.ModuleConstants.kWheelDiameterMeters * Math.PI;
+                * (Constants.ModuleConstants.kWheelDiameterMeters * Math.PI);
     }
 
     /*
@@ -114,6 +147,8 @@ public class SwerveModule {
      * Returns the current state of the swerve module using position.
      */
     public SwerveModulePosition getPosition() {
+        SmartDashboard.putNumber("Swerve[" + canCoder.getDeviceID() + "] position", getDrivePosition());
+
         return new SwerveModulePosition(getDrivePosition(), new Rotation2d(getTurningPosition()));
     }
 

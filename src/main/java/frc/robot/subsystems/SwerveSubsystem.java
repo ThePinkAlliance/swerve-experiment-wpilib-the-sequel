@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -54,12 +55,13 @@ public class SwerveSubsystem extends SubsystemBase {
             DriveConstants.kBackRightDriveAbsoluteEncoderReversed);
 
     private final AHRS gyro = new AHRS(SPI.Port.kMXP);
-    private final SwerveDriveOdometry odometer = new SwerveDriveOdometry(DriveConstants.kDriveKinematics,
-            new Rotation2d(0), new SwerveModulePosition[] { new SwerveModulePosition(),
-                    new SwerveModulePosition(),
-                    new SwerveModulePosition(),
-                    new SwerveModulePosition() },
-            new Pose2d());
+    private final SwerveDriveOdometry estimator = new SwerveDriveOdometry(DriveConstants.kDriveKinematics,
+            getRotation2d(), new SwerveModulePosition[] {
+                    frontLeft.getPosition(),
+                    frontRight.getPosition(),
+                    backLeft.getPosition(),
+                    backRight.getPosition()
+            }, new Pose2d());
 
     public SwerveSubsystem() {
         new Thread(() -> {
@@ -88,15 +90,24 @@ public class SwerveSubsystem extends SubsystemBase {
         return Rotation2d.fromDegrees(getHeading());
     }
 
+    /**
+     * NOTE: This method has been returning incorrect positions when using
+     * SwerveControllerCommand
+     */
     public Pose2d getPose() {
-        return odometer.getPoseMeters();
+        return estimator.getPoseMeters();
     }
 
     public void resetOdometry(Pose2d pose) {
-        odometer.resetPosition(getRotation2d(), new SwerveModulePosition[] { new SwerveModulePosition(),
-                new SwerveModulePosition(),
-                new SwerveModulePosition(),
-                new SwerveModulePosition() }, pose);
+        estimator.resetPosition(getRotation2d(),
+                new SwerveModulePosition[] { frontLeft
+                        .getPosition(),
+                        frontRight
+                                .getPosition(),
+                        backLeft.getPosition(),
+                        backRight
+                                .getPosition() },
+                pose);
     }
 
     /*
@@ -122,12 +133,13 @@ public class SwerveSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        odometer.update(getRotation2d(),
+        estimator.update(getRotation2d(),
                 new SwerveModulePosition[] { frontLeft.getPosition(), frontRight.getPosition(), backLeft.getPosition(),
                         backRight.getPosition() });
 
         SmartDashboard.putNumber("Robot Heading", getHeading());
-        SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
+        SmartDashboard.putNumber("Robot Location X", getPose().getTranslation().getX());
+        SmartDashboard.putNumber("Robot Location Y", getPose().getTranslation().getY());
 
         frontLeft.printDebug();
         frontRight.printDebug();

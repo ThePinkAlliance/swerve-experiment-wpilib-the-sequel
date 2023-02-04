@@ -4,6 +4,6 @@
   "maxVelocity": 4.0,
   "maxAcceleration": 2.0,
   "trackWidth": 0.64,
-  "gameName": "Rapid React",
+  "gameName": "Charged Up",
   "outputDir": "../src/main/deploy"
 }
