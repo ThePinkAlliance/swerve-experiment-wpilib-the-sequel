@@ -10,15 +10,17 @@ import frc.robot.subsystems.camera.PhotonVisionCamera;
 import frc.robot.subsystems.camera.CameraInterface.PipelineType;
 
 public class CameraSubsystem extends SubsystemBase {
-    //private CameraInterface camera = new PhotonVisionCamera();
+    // private CameraInterface camera = new PhotonVisionCamera();
     private CameraInterface camera = new LimeLightCamera();
-    
+
     public CameraSubsystem() {
-        if (!Robot.isReal()) camera = new CameraInterfaceSim();
+        if (!Robot.isReal())
+            camera = new CameraInterfaceSim();
     }
 
     /**
      * Get closest target data.
+     * 
      * @return closest target data
      */
     public CameraData getTarget() {
@@ -27,10 +29,10 @@ public class CameraSubsystem extends SubsystemBase {
 
     /**
      * Set the pipeline type.
+     * 
      * @param type the pipeline type
      */
-    public void setPipeline(PipelineType type)
-    {
+    public void setPipeline(PipelineType type) {
         camera.setPipeline(type);
     }
 

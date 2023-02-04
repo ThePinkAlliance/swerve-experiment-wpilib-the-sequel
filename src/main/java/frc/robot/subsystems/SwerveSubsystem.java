@@ -55,7 +55,7 @@ public class SwerveSubsystem extends SubsystemBase {
             DriveConstants.kBackRightDriveAbsoluteEncoderReversed);
 
     private final AHRS gyro = new AHRS(SPI.Port.kMXP);
-    private final SwerveDriveOdometry estimator = new SwerveDriveOdometry(DriveConstants.kDriveKinematics,
+    private final SwerveDrivePoseEstimator estimator = new SwerveDrivePoseEstimator(DriveConstants.kDriveKinematics,
             getRotation2d(), new SwerveModulePosition[] {
                     frontLeft.getPosition(),
                     frontRight.getPosition(),
@@ -95,7 +95,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * SwerveControllerCommand
      */
     public Pose2d getPose() {
-        return estimator.getPoseMeters();
+        return estimator.getEstimatedPosition();
     }
 
     public void resetOdometry(Pose2d pose) {
@@ -122,6 +122,10 @@ public class SwerveSubsystem extends SubsystemBase {
                 new SwerveModuleState(backLeft.getState().speedMetersPerSecond, new Rotation2d(heading)));
         backRight.setDesiredState(
                 new SwerveModuleState(backRight.getState().speedMetersPerSecond, new Rotation2d(heading)));
+    }
+
+    public void addVisionMeasurement(Pose2d pose, double timestamp) {
+        this.estimator.addVisionMeasurement(pose, timestamp);
     }
 
     public void setKp(double kP) {
@@ -155,7 +159,8 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     public void move(double vx, double vy, double radsPerSecond) {
-        setModuleStates(Constants.DriveConstants.kDriveKinematics.toSwerveModuleStates(new ChassisSpeeds(vx, vy, radsPerSecond)));
+        setModuleStates(Constants.DriveConstants.kDriveKinematics
+                .toSwerveModuleStates(new ChassisSpeeds(vx, vy, radsPerSecond)));
     }
 
     public void setModuleStates(SwerveModuleState[] desiredStates) {
