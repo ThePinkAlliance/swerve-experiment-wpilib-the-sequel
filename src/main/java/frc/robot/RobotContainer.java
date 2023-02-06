@@ -37,9 +37,7 @@ import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.commands.Zero;
 import frc.robot.subsystems.CameraSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.camera.CameraData;
-import frc.robot.subsystems.camera.CameraData.TargetData;
-import org.photonvision.PhotonCamera;
+import frc.robot.subsystems.CameraSubsystem.CameraType;
 
 public class RobotContainer {
 
@@ -47,15 +45,15 @@ public class RobotContainer {
         private final ShuffleboardTab debugTab = Shuffleboard.getTab("debug");
         private Trajectory trajectory = null;
         private final Joystick driverJoytick = new Joystick(OIConstants.kDriverControllerPort);
-        private final CameraSubsystem cameraSubsystem = new CameraSubsystem();
-        // private final PhotonCamera camera = new
-        // PhotonCamera(NetworkTableInstance.getDefault(), "main");
+        private final CameraSubsystem cameraSubsystem = new CameraSubsystem(CameraType.LIMELIGHT);
 
         PIDController xController = new PIDController(AutoConstants.kPXController, 0.5, 0);
         PIDController yController = new PIDController(AutoConstants.kPYController, 0, 0);
         ProfiledPIDController thetaController = new ProfiledPIDController(
                         AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
         Path file;
+
+        private final Command autoMoveCommand = new AutoCommandGroup(swerveSubsystem, cameraSubsystem);
 
         public RobotContainer() {
                 swerveSubsystem.setDefaultCommand(new SwerveJoystickCmd(

@@ -54,7 +54,6 @@ public interface CameraInterface {
             SmartDashboard.putNumber("Cam Target X Angle", data.getTargets().get(0).targetXAngle);
             SmartDashboard.putNumber("Cam Target Y Angle", data.getTargets().get(0).targetYAngle);
         }
-
     }
 
     /**

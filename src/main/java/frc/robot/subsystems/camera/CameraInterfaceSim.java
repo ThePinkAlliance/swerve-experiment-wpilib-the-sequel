@@ -15,6 +15,7 @@ public class CameraInterfaceSim implements CameraInterface {
     private static final String CAM_LATENCY_KEY = "SimCam latency millis";
     private static final String CAM_XANGLE_KEY = "SimCam target X angle";
     private static final String CAM_YANGLE_KEY = "SimCam target Y angle";
+    private static final String CAM_ZANGLE_KEY = "SimCam target Z angle";
     private static final String CAM_DISTANCE_KEY = "SimCam target distance (m)";
     private static final String CAM_IS_APRIL_TAG_KEY = "SimCam is AprilTag";
 
@@ -27,6 +28,7 @@ public class CameraInterfaceSim implements CameraInterface {
         SmartDashboard.putNumber(CAM_LATENCY_KEY, 40000);
         SmartDashboard.putNumber(CAM_XANGLE_KEY, 0);
         SmartDashboard.putNumber(CAM_YANGLE_KEY, 0);
+        SmartDashboard.putNumber(CAM_ZANGLE_KEY, 0);
         SmartDashboard.putNumber(CAM_DISTANCE_KEY, 1.0);
     }
 
@@ -42,6 +44,7 @@ public class CameraInterfaceSim implements CameraInterface {
                 retVal.addAprilTagTarget((int)SmartDashboard.getNumber(CAM_ID_KEY, 1), 
                     SmartDashboard.getNumber(CAM_XANGLE_KEY, 0), 
                     SmartDashboard.getNumber(CAM_YANGLE_KEY, 0), 
+                    SmartDashboard.getNumber(CAM_ZANGLE_KEY, 0),
                     SmartDashboard.getNumber(CAM_DISTANCE_KEY, 1.0));
             }
         } else {

@@ -33,6 +33,13 @@ public class CameraData {
         public double targetYAngle = 0;
 
         /**
+         * How parallel if the robot to the target, 0 being parallel, negative means the robot
+         * needs to turn clockwise to be parallel, and positive means the robot needs to turn
+         * counter closewise.
+         */
+        public double targetZAngle = 0;
+        
+        /**
          * Distance to the target.
          */
         public double targetDistance = 0;
@@ -70,20 +77,14 @@ public class CameraData {
      * @param yAngle the vertical angle (0 is in front of the camera) to the target
      * @param distance the distance from the camera to the target
      */
-    public void addAprilTagTarget(int id, double xAngle, double yAngle, double distance) {
+    public void addAprilTagTarget(int id, double xAngle, double yAngle, double zAngle, double distance) {
         TargetData newTarget = new TargetData();
         newTarget.id = id;
         newTarget.targetXAngle = xAngle;
         newTarget.targetYAngle = yAngle;
+        newTarget.targetZAngle = zAngle;
         newTarget.targetDistance = distance;
         newTarget.targetType = PipelineType.APRIL_TAG;
-        //Comment by Omar while integrating Carlos / Sam code. 
-        //I added a single aprilTag field for now because of this line (targets.add(newTarget).  Once this is resolved or 
-        //if its working correctly, e.g. we will not be capturing infinite target data objects then 
-        //the temporary single aprilTag can be removed.  For now I am testing with the single target.
-        //I think the intent is to have at most 6 april tags target objects, each getting re-updated when
-        //they are seen.  However, I think the add below is just going create a long long list of objects of which we 
-        //only check the first one.  Same question/issue applies to the reflective list
         targets.add(newTarget);
     }
 
