@@ -15,8 +15,7 @@ public class LimeLightCamera implements CameraInterface {
     @Override
     public boolean isConnected() {
         boolean isConnected = false;
-        if (getCamera().containsKey("getpipe"))
-            isConnected = true;
+        if(getCamera().containsKey("getpipe")) isConnected = true;
         return isConnected;
     }
 
@@ -27,17 +26,12 @@ public class LimeLightCamera implements CameraInterface {
 
     /**
      * Gets the pipeline index from the PhotonVision camera.
-     * 
      * @return the pipeline index
      */
     private int getPipelineIndex() {
-        NetworkTable cam = getCamera();
-        // System.out.println();
-
         if (isConnected()) {
-            return (int) (cam.getEntry("getpipe").getDouble(0));
-        } else
-            throw new IllegalStateException("Limelight camera not connected");
+            return (int)(getCamera().getEntry("getpipe").getDouble(0));
+        } else throw new IllegalStateException("Limelight camera not connected");
     }
 
     @Override
@@ -46,7 +40,7 @@ public class LimeLightCamera implements CameraInterface {
             int pipelineIndex = getPipelineIndex(type);
             getCamera().putValue("pipeline", NetworkTableValue.makeDouble(pipelineIndex));
         }
-
+        
         return getPipelineType(getPipelineIndex());
     }
 
@@ -60,11 +54,11 @@ public class LimeLightCamera implements CameraInterface {
             camTargets.latencyMillis = camera.getEntry("tl").getDouble(0);
             // This check is not reliable, but we use it anyways.
             boolean hasTargets = camera.getEntry("tv").getDouble(0) == 1;
-            if (hasTargets) {
+            if (hasTargets) { 
                 switch (camTargets.pipelineType) {
                     case APRIL_TAG:
                         getAprilTagTargets(camera, camTargets);
-
+                    
                     case REFLECTIVE:
                         getReflectiveTarget(camera, camTargets);
                 }
@@ -76,38 +70,35 @@ public class LimeLightCamera implements CameraInterface {
 
     /**
      * Get reflective target data.
-     * 
-     * @param camera     the camera reference
+     * @param camera the camera reference
      * @param camTargets
      * @return a list of 0 or more reflective targets from largest area to smallest.
      */
     private void getReflectiveTarget(NetworkTable camera, CameraData camTargets) {
-        // TODO: How do we get multiple targets?
-        camTargets.addReflectiveTarget(0, camera.getEntry("tx").getDouble(0),
-                camera.getEntry("ty").getDouble(0));
+        //TODO: How do we get multiple targets?
+        camTargets.addReflectiveTarget(0, camera.getEntry("tx").getDouble(0), 
+            camera.getEntry("ty").getDouble(0));
     }
 
     /**
      * Get april tag target data.
-     * 
-     * @param camera     the camera reference
+     * @param camera the camera reference
      * @param camTargets
      * @return a list of 0 or more april tag targets from closest to farthest.
      */
     private void getAprilTagTargets(NetworkTable camera, CameraData camTargets) {
-        // TODO: How do we get multiple targets?
+        //TODO: How do we get multiple targets?
         double[] camPose = camera.getEntry("targetpose_cameraspace").getDoubleArray(new double[0]);
         String aa = "";
-        for (int i = 0; i < camPose.length; i++)
-            aa += camPose[i] + ",";
+        for (int i=0; i<camPose.length; i++) aa += camPose[i] + ",";
         System.out.println("CAMPOSE: " + aa);
         // Don't trust the flag that tells you there is a target
         if (camPose.length > 5) {
             double targetDistance = Math.abs(camPose[2]);
             double zAngle = camPose[4];
             double computedZAngle = zAngle; // Same as the reported angle.
-            camTargets.addAprilTagTarget(0, camera.getEntry("tx").getDouble(0),
-                    camera.getEntry("ty").getDouble(0), computedZAngle, targetDistance);
+            camTargets.addAprilTagTarget(0, camera.getEntry("tx").getDouble(0), 
+                camera.getEntry("ty").getDouble(0), computedZAngle, targetDistance);
         }
     }
 }
