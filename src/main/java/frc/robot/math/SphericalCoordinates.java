@@ -5,12 +5,56 @@ import edu.wpi.first.math.geometry.Translation3d;
 public class SphericalCoordinates {
   private final double phi;
   private final double theta;
-  private final double projection;
+  private final double r;
 
-  public SphericalCoordinates(double phi, double theta, double projection) {
+  public SphericalCoordinates(double projection, double theta, double phi) {
     this.phi = phi;
-    this.projection = projection;
+    this.r = projection;
     this.theta = theta;
+  }
+
+  public SphericalCoordinates() {
+    this.phi = 0;
+    this.r = 0;
+    this.theta = 0;
+  }
+
+  /**
+   * Convert from cartesian space to spherical space.
+   * 
+   * @param translation3d
+   */
+  public static SphericalCoordinates fromCartesian(Translation3d translation3d) {
+    double x2 = translation3d.getX() * translation3d.getX();
+    double y2 = translation3d.getY() * translation3d.getY();
+    double z2 = translation3d.getZ() * translation3d.getZ();
+
+    double projection = Math.sqrt(x2 + y2 + z2);
+    double theta = Math.atan2(translation3d.getY(), translation3d.getX());
+    double phi = Math.acos(translation3d.getZ() / (Math.sqrt(x2 + y2 + z2)));
+
+    return new SphericalCoordinates(projection, theta, phi);
+  }
+
+  /**
+   * Convert spherical coordinates to cartesian space.
+   * 
+   * @param coordinates
+   */
+  public static Translation3d toCartesian(SphericalCoordinates coordinates) {
+    double x = coordinates.r * Math.sin(coordinates.phi) * Math.cos(coordinates.theta);
+    double y = coordinates.r * Math.sin(coordinates.phi) * Math.sin(coordinates.theta);
+    double z = coordinates.r * Math.cos(coordinates.phi);
+
+    return new Translation3d(x, y, z);
+  }
+
+  /**
+   * Convert spherical coordinates to cartesian space.
+   * 
+   */
+  public Translation3d toCartesian() {
+    return SphericalCoordinates.toCartesian(this);
   }
 
   public double getTheta() {
@@ -21,38 +65,8 @@ public class SphericalCoordinates {
     return phi;
   }
 
-  public double getProjection() {
-    return projection;
-  }
-
-  /**
-   * Convert from cartesian space to spherical space.
-   * 
-   * @param transform3d
-   */
-  public static SphericalCoordinates fromCartesian(Translation3d transform3d) {
-    double x2 = transform3d.getX() * transform3d.getX();
-    double y2 = transform3d.getY() * transform3d.getY();
-    double z2 = transform3d.getZ() * transform3d.getZ();
-
-    double theta = Math.tan(transform3d.getY() / transform3d.getX());
-    double phi = Math.acos(transform3d.getZ() / (Math.sqrt(x2 + y2 + z2)));
-    double projection = Math.sqrt(x2) + Math.sqrt(y2) + Math.sqrt(z2);
-
-    return new SphericalCoordinates(phi, theta, projection);
-  }
-
-  /**
-   * Convert spherical coordinates to cartesian space.
-   * 
-   * @param coordinates
-   */
-  public static Translation3d toCartesian(SphericalCoordinates coordinates) {
-    double x = coordinates.projection * Math.sin(coordinates.phi) * Math.cos(coordinates.theta);
-    double y = coordinates.projection * Math.sin(coordinates.phi) * Math.sin(coordinates.theta);
-    double z = coordinates.projection * Math.cos(coordinates.theta);
-
-    return new Translation3d(x, y, z);
+  public double getR() {
+    return r;
   }
 
 }
