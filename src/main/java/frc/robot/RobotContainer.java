@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.trajectory.Trajectory;
@@ -15,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.AprilTagOdometryUpdater;
 import frc.robot.commands.AutoCommandGroup;
@@ -35,7 +38,14 @@ public class RobotContainer {
 
         private final Command autoMoveCommand = new AutoCommandGroup(swerveSubsystem, cameraSubsystem);
 
+        public static PIDController xController = new PIDController(AutoConstants.kPXController, 0.5, 0);
+        public static PIDController yController = new PIDController(AutoConstants.kPYController, 0, 0);
+        public static ProfiledPIDController thetaController = new ProfiledPIDController(
+                        AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
+
         public RobotContainer() {
+                thetaController.enableContinuousInput(-Math.PI, Math.PI);
+
                 swerveSubsystem.setDefaultCommand(new SwerveJoystickCmd(
                                 swerveSubsystem,
                                 () -> -driverJoytick.getRawAxis(OIConstants.kDriverYAxis),
@@ -50,9 +60,9 @@ public class RobotContainer {
 
                 SmartDashboard.putData("Auto Chooser", autoSendable);
 
-                debugTab.add(Constants.AutoConstants.xController);
-                debugTab.add(Constants.AutoConstants.yController);
-                debugTab.add(Constants.AutoConstants.thetaController);
+                debugTab.add(xController);
+                debugTab.add(yController);
+                debugTab.add(thetaController);
 
                 try {
                         Trajectory idk = TrajectoryUtil.fromPathweaverJson(
