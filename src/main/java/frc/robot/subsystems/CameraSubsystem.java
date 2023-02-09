@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.subsystems.camera.CameraData;
@@ -21,6 +22,8 @@ public class CameraSubsystem extends SubsystemBase {
     private CameraInterface camera;
 
     public CameraSubsystem(CameraType type) {
+        NetworkTableInstance.getDefault().flush();
+
         if (!Robot.isReal())
             camera = new CameraInterfaceSim();
         else if (type == CameraType.PHOTON_VISION)

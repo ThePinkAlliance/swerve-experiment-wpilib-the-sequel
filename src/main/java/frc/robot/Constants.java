@@ -1,5 +1,7 @@
 package frc.robot;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -94,6 +96,15 @@ public final class Constants {
                 new TrapezoidProfile.Constraints(
                         kMaxAngularSpeedRadiansPerSecond,
                         kMaxAngularAccelerationRadiansPerSecondSquared);
+
+        public static PIDController xController = new PIDController(AutoConstants.kPXController, 0.5, 0);
+        public static PIDController yController = new PIDController(AutoConstants.kPYController, 0, 0);
+        public static ProfiledPIDController thetaController = new ProfiledPIDController(
+                AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
+
+        public AutoConstants() {
+            thetaController.enableContinuousInput(-Math.PI, Math.PI);
+        }
     }
 
     public static final class OIConstants {
