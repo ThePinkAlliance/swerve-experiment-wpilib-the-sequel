@@ -7,9 +7,9 @@ public class SphericalCoordinates {
   private final double theta;
   private final double r;
 
-  public SphericalCoordinates(double projection, double theta, double phi) {
+  public SphericalCoordinates(double r, double theta, double phi) {
     this.phi = phi;
-    this.r = projection;
+    this.r = r;
     this.theta = theta;
   }
 
@@ -47,6 +47,14 @@ public class SphericalCoordinates {
     double z = coordinates.r * Math.cos(coordinates.phi);
 
     return new Translation3d(x, y, z);
+  }
+
+  public SphericalCoordinates subtract(SphericalCoordinates coordinates) {
+    double r = this.r - coordinates.r;
+    double theta = this.theta - coordinates.theta;
+    double phi = this.phi - coordinates.phi;
+
+    return new SphericalCoordinates(r, theta, phi);
   }
 
   /**

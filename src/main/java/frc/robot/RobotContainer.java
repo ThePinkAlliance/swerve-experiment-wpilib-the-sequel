@@ -2,7 +2,6 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -10,38 +9,43 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryUtil;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.AprilTagOdometryUpdater;
-import frc.robot.commands.AutoCommandGroup;
 import frc.robot.commands.Navigate;
 import frc.robot.commands.SwerveJoystickCmd;
 import frc.robot.commands.Zero;
-import frc.robot.subsystems.CameraSubsystem;
+import frc.robot.commands.arm.CommandExtendPivot;
+import frc.robot.commands.arm.CommandTurret;
 import frc.robot.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.CameraSubsystem.CameraType;
+import frc.robot.subsystems.arm.ArmSubsystem;
+import frc.robot.subsystems.arm.TurretSubsystem;
 
 public class RobotContainer {
 
         private final SwerveSubsystem swerveSubsystem = new SwerveSubsystem();
         private final ShuffleboardTab debugTab = Shuffleboard.getTab("debug");
         private final Joystick driverJoytick = new Joystick(OIConstants.kDriverControllerPort);
-        private final CameraSubsystem cameraSubsystem = new CameraSubsystem(CameraType.LIMELIGHT);
-        private SendableChooser<Trajectory> autoSendable = new SendableChooser<Trajectory>();
+        private final Joystick towerJoytick = new Joystick(OIConstants.kTowerControllerPort);
 
-        private final Command autoMoveCommand = new AutoCommandGroup(swerveSubsystem, cameraSubsystem);
+        private SendableChooser<Trajectory> autoSendable = new SendableChooser<Trajectory>();
 
         public static PIDController xController = new PIDController(AutoConstants.kPXController, 0.5, 0);
         public static PIDController yController = new PIDController(AutoConstants.kPYController, 0, 0);
         public static ProfiledPIDController thetaController = new ProfiledPIDController(
                         AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
+
+        // Tower
+        private final TurretSubsystem turretSubsystem = new TurretSubsystem(0, new Constraints(0, 0));
+        private final ArmSubsystem armSubsystem = new ArmSubsystem(0, 0, 0, 0, new Constraints(0, 0));
 
         public RobotContainer() {
                 thetaController.enableContinuousInput(-Math.PI, Math.PI);
@@ -52,9 +56,13 @@ public class RobotContainer {
                                 () -> -driverJoytick.getRawAxis(OIConstants.kDriverXAxis),
                                 () -> driverJoytick.getRawAxis(OIConstants.kDriverRotAxis),
                                 () -> !driverJoytick.getRawButton(OIConstants.kDriverFieldOrientedButtonIdx)));
-                cameraSubsystem.setDefaultCommand(new AprilTagOdometryUpdater(
-                                (pose) -> swerveSubsystem.addVisionMeasurement(pose, Timer.getFPGATimestamp()),
-                                cameraSubsystem));
+
+                armSubsystem.setDefaultCommand(new CommandExtendPivot(armSubsystem, () -> towerJoytick.getRawAxis(1),
+                                () -> towerJoytick.getRawAxis(0)));
+                turretSubsystem.setDefaultCommand(new CommandTurret(turretSubsystem, () -> towerJoytick.getRawAxis(3)));
+
+                new JoystickButton(towerJoytick, 3)
+                                .onTrue(new ArmCoordinator(new Translation3d(1, 1, 1), armSubsystem, turretSubsystem));
 
                 configureButtonBindings();
 

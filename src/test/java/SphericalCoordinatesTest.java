@@ -1,6 +1,7 @@
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import frc.robot.math.SphericalCoordinates;
 import org.junit.jupiter.api.Test;
 
@@ -23,5 +24,18 @@ public class SphericalCoordinatesTest {
     assertEquals(7.3484, sphericalCoordinates.getR(), 0.05, "R Coordinate Matches");
     assertEquals(-2.6779, sphericalCoordinates.getTheta(), 0.05, "Theta Coordinate Matches");
     assertEquals(2.8323, sphericalCoordinates.getPhi(), 0.05, "Phi Coordinate Matches");
+  }
+
+  @Test
+  public void subtraction() {
+    SphericalCoordinates desiredCoordinates = new SphericalCoordinates(1, Units.degreesToRadians(90),
+        Units.degreesToRadians(180));
+    SphericalCoordinates currentCoordinates = new SphericalCoordinates(0.5, Units.degreesToRadians(90),
+        Units.degreesToRadians(90));
+    SphericalCoordinates coordinateDifference = desiredCoordinates.subtract(currentCoordinates);
+
+    assertEquals(0.5, coordinateDifference.getR(), 0.05, "R Coordinate Matches");
+    assertEquals(0, coordinateDifference.getTheta(), 0.05, "Theta Coordinate Matches");
+    assertEquals(1.57, coordinateDifference.getPhi(), 0.05, "Phi Coordinate Matches");
   }
 }
